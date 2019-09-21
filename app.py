@@ -4,7 +4,10 @@ app = Flask(__name__)
 
 @app.route("/get_vec/<string:word>/")
 def getWord(word):
-    return jsonify(model.wv[word].tolist())
+    try:
+        return jsonify(model.wv[word].tolist())
+    except KeyError:
+        return jsonify(-1)
 
 if __name__ == '__main__':
     model = gensim.models.KeyedVectors.load_word2vec_format('./GoogleNews-vectors-negative300.bin', binary=True)
