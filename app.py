@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 import gensim
-app = Flask(__name__, static_url_path='', static_folder='static')
+app = Flask(__name__, host='0.0.0.0', port=5001, static_url_path='', static_folder='static')
 
 @app.route("/get_vec/<string:word>/")
 def getWord(word):
