@@ -23,14 +23,14 @@ def get_axes():
     return jsonify(list(AXES.keys()))
 
 @app.route("/get_projection/<string:axis>/<string:word>/")
-def get_projection():
+def get_projection(axis, word):
     if axis not in AXES:
         return jsonify(-1)
         
     axis_vec = AXES[axis]
     word_vec = model.wv[word].tolist()
     
-    return (np.dot(word_vec, axis_vec) / np.dot(axis_vec, axis_vec)) * axis_vec
+    return jsonify(np.dot(word_vec, axis_vec) / np.sqrt(np.dot(axis_vec, axis_vec)))
 
 class RandomDictionary():
     def __init__(self, vector_size):
@@ -44,7 +44,7 @@ class DebugModel():
         self.rand_dict = RandomDictionary(vector_size)
     
     @property
-    def wv():
+    def wv(self):
         return self.rand_dict
 
 if __name__ == '__main__':
