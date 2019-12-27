@@ -8,7 +8,8 @@ import numpy as np
 app = Flask(__name__, static_url_path='', static_folder='static')
 
 AXES = {
-    'test': np.ones(300)
+    'test1': np.ones(300),
+    'test2': np.random.rand(300)
 }
 
 @app.route("/get_vec/<string:word>/")
@@ -28,9 +29,31 @@ def get_projection(axis, word):
         return jsonify(-1)
         
     axis_vec = AXES[axis]
-    word_vec = model.wv[word].tolist()
+    
+    try:
+        word_vec = model.wv[word].tolist()
+    except KeyError:
+        return jsonify(-1)
     
     return jsonify(np.dot(word_vec, axis_vec) / np.sqrt(np.dot(axis_vec, axis_vec)))
+
+@app.route("/get_2d_projection/<string:xaxis>/<string:yaxis>/<string:word>/")
+def get_2d_projection(xaxis, yaxis, word):
+    if yaxis not in AXES or xaxis not in AXES:
+        return jsonify(-1)
+    
+    yaxis_vec = AXES[yaxis]
+    xaxis_vec = AXES[xaxis]
+    
+    try:
+        word_vec = model.wv[word].tolist()
+    except KeyError:
+        return jsonify(-1)
+    
+    basis = np.c_[xaxis, yaxis]
+    basis_inv = np.linalg.pinv(basis)
+    
+    return jsonify(basis_inv.dot(word_vec))
 
 class RandomDictionary():
     def __init__(self, vector_size):
