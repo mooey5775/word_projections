@@ -37,6 +37,7 @@ class RandomDictionary():
         self.vec_size = vector_size
     
     def __getitem__(self, key):
+        np.random.seed([ord(i) for i in key])
         return np.random.rand(self.vec_size)
         
 class DebugModel():
