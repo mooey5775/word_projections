@@ -48,6 +48,9 @@ def get_2d_projection(xaxis, yaxis, word):
     yaxis_vec = AXES[yaxis]
     xaxis_vec = AXES[xaxis]
 
+    yaxis_vec /= np.linalg.norm(yaxis_vec)
+    xaxis_vec /= np.linalg.norm(xaxis_vec)
+
     try:
         word_vec = model.wv[word].tolist()
     except KeyError:
@@ -88,15 +91,15 @@ if __name__ == '__main__':
         model = DebugModel(300)
     else:
         model = gensim.models.KeyedVectors.load_word2vec_format('./GoogleNews-vectors-negative300.bin', binary=True)
-    
+
     # Generate axes
     print("[INFO] Generating axes")
     for axis in AXIS_DEFS:
         word_pairs = AXIS_DEFS[axis]
         all_axis_vecs = [model.wv[wp[0]] - model.wv[wp[1]] for wp in word_pairs]
         AXES[axis] = np.average(all_axis_vecs, axis=0)
-        
+
     print("[INFO] Available axes:")
-    print(list(AXES.keys())
+    print(list(AXES.keys()))
 
     app.run(host='0.0.0.0', port=5001)
