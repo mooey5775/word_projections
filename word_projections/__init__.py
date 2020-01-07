@@ -21,6 +21,14 @@ AXIS_DEFS = {
     'race': [('black', 'white'), ('blacks', 'whites'), ('Blacks', 'Whites'), ('Black', 'White'), ('African', 'European'), ('African', 'Caucasian')]
 }
 
+# Empty container to be filled on setup
+
+class ModelContainer:
+    model = None
+    axes = None
+
+mc = ModelContainer()
+
 # Error handlers
 
 @app.errorhandler(WordNotFound400)
@@ -39,29 +47,29 @@ def invalid_list_error(error):
 
 @app.route("/get_vec/<string:word>/")
 def get_word(word):
-    return jsonify(model.get_word_vec_list(word))
+    return jsonify(mc.model.get_word_vec_list(word))
 
 @app.route("/get_axes/")
 def get_axes():
-    return jsonify(axes.list_axes())
+    return jsonify(mc.axes.list_axes())
 
 @app.route("/get_projection/<string:axis>/<string:word>/")
 def get_projection(axis, word):
-    axis_vec = axes.get_axis_vec(axis)
+    axis_vec = mc.axes.get_axis_vec(axis)
 
-    word_vec = model.get_word_vec_list(word)
+    word_vec = mc.model.get_word_vec_list(word)
 
     return jsonify(np.dot(word_vec, axis_vec) / np.sqrt(np.dot(axis_vec, axis_vec)))
 
 @app.route("/get_2d_projection/<string:xaxis>/<string:yaxis>/<string:word>/")
 def get_2d_projection(xaxis, yaxis, word):
-    yaxis_vec = axes.get_axis_vec(yaxis)
-    xaxis_vec = axes.get_axis_vec(xaxis)
+    yaxis_vec = mc.axes.get_axis_vec(yaxis)
+    xaxis_vec = mc.axes.get_axis_vec(xaxis)
 
     yaxis_vec /= np.linalg.norm(yaxis_vec)
     xaxis_vec /= np.linalg.norm(xaxis_vec)
 
-    word_vec = model.get_word_vec_list(word)
+    word_vec = mc.model.get_word_vec_list(word)
 
     basis = np.c_[xaxis_vec, yaxis_vec]
     basis_inv = np.linalg.pinv(basis)
@@ -70,20 +78,20 @@ def get_2d_projection(xaxis, yaxis, word):
 
 @app.route("/get_batch_projections/<string:axis>/", methods=['POST'])
 def get_batch_projections(axis):
-    axis_vec = axes.get_axis_vec(axis)
+    axis_vec = mc.axes.get_axis_vec(axis)
 
     if not isinstance(request.json, list):
         raise InvalidList400
 
-    word_vecs = [model.get_word_vec_list(word) for word in request.json]
+    word_vecs = [mc.model.get_word_vec_list(word) for word in request.json]
     projections = [np.dot(word_vec, axis_vec) / np.sqrt(np.dot(axis_vec, axis_vec)) for word_vec in word_vecs]
 
     return jsonify(projections)
 
 @app.route("/get_batch_2d_projections/<string:xaxis>/<string:yaxis>", methods=['POST'])
 def get_batch_2d_projections(xaxis, yaxis):
-    yaxis_vec = axes.get_axis_vec(yaxis)
-    xaxis_vec = axes.get_axis_vec(xaxis)
+    yaxis_vec = mc.axes.get_axis_vec(yaxis)
+    xaxis_vec = mc.axes.get_axis_vec(xaxis)
 
     yaxis_vec /= np.linalg.norm(yaxis_vec)
     xaxis_vec /= np.linalg.norm(xaxis_vec)
@@ -94,7 +102,7 @@ def get_batch_2d_projections(xaxis, yaxis):
     projections = []
 
     for word in request.json:
-        word_vec = model.get_word_vec_list(word)
+        word_vec = mc.model.get_word_vec_list(word)
         basis = np.c_[xaxis_vec, yaxis_vec]
         basis_inv = np.linalg.pinv(basis)
 
@@ -102,28 +110,29 @@ def get_batch_2d_projections(xaxis, yaxis):
 
     return jsonify(projections)
 
-# Check for debug mode
+def setup_app():
+    # Check for debug mode
 
-ap = argparse.ArgumentParser()
-ap.add_argument('--debug', action='store_true',
-                help="use random data instead of loading model")
-ap.add_argument('--debug-dims', type=int, default=300,
-                help="dimension of debug model data")
-args = vars(ap.parse_args())
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--debug', action='store_true',
+                    help="use random data instead of loading model")
+    ap.add_argument('--debug-dims', type=int, default=300,
+                    help="dimension of debug model data")
+    args = vars(ap.parse_args())
 
-# Selectively load model based on debug mode
+    # Selectively load model based on debug mode
 
-logging.info("Loading model...")
-if args['debug']:
-    logging.warning("DEBUG MODE ENABLED")
-    logging.warning("DO NOT RUN IN PRODUCTION ENVIRONMENT")
-    model = DebugModel(args['debug_dims'])
-else:
-    model = Word2VecModel(MODEL_FILE_PATH)
+    logging.info("Loading model...")
+    if args['debug']:
+        logging.warning("DEBUG MODE ENABLED")
+        logging.warning("DO NOT RUN IN PRODUCTION ENVIRONMENT")
+        mc.model = DebugModel(args['debug_dims'])
+    else:
+        mc.model = Word2VecModel(MODEL_FILE_PATH)
 
-# Generate axes
+    # Generate axes
 
-logging.info("Generating axes")
-axes = AxisHandler(model, AXIS_DEFS)
+    logging.info("Generating axes")
+    mc.axes = AxisHandler(mc.model, AXIS_DEFS)
 
-logging.info(f"Available axes: {axes.list_axes()}")
+    logging.info(f"Available axes: {mc.axes.list_axes()}")
