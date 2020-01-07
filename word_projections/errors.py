@@ -3,3 +3,6 @@ class WordNotFound400(Exception):
 
 class AxisNotFound400(Exception):
     pass
+
+class InvalidList400(Exception):
+    pass
