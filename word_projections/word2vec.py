@@ -6,6 +6,7 @@ from .errors import WordNotFound400
 class Word2VecModel:
     def __init__(self):
         self.model = api.load('word2vec-google-news-300')
+        self.dims = 300
 
     def get_word_vec(self, word):
         try:

@@ -21,8 +21,9 @@ AXIS_DEFS = {
 # Empty container to be filled on setup
 
 class ModelContainer:
-    model = None
-    axes = None
+    def __init__(self):
+        self.model = None
+        self.axes = None
 
 mc = ModelContainer()
 
