@@ -2,3 +2,4 @@ flask
 gensim
 numpy
 pytest
+pytest-cov
