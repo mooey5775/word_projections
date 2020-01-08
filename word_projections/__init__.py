@@ -12,8 +12,6 @@ from .axis_handler import AxisHandler
 app = Flask(__name__, static_url_path='', static_folder='static')
 logging.basicConfig(level=logging.INFO)
 
-MODEL_FILE_PATH = './GoogleNews-vectors-negative300.bin'
-
 AXIS_DEFS = {
     'gender': [('man', 'woman'), ('men', 'women'), ('he', 'she'), ('him', 'her'), ('his', 'her'), ('his', 'hers'), ('boy', 'girl'), ('boys', 'girls'), ('male', 'female'), ('masculine', 'feminine')],
     'class': [('rich', 'poor'), ('richer', 'poorer'), ('richest', 'poorest'), ('affluence', 'poverty'), ('affluent', 'impoverished'), ('expensive', 'inexpensive'), ('luxury', 'cheap'), ('opulent', 'needy')],
@@ -127,7 +125,7 @@ def setup_app():
         logging.warning("DO NOT RUN IN PRODUCTION ENVIRONMENT")
         mc.model = DebugModel(args['debug_dims'])
     else:
-        mc.model = Word2VecModel(MODEL_FILE_PATH)
+        mc.model = Word2VecModel()
 
     # Generate axes
 

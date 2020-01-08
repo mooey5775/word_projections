@@ -1,16 +1,15 @@
-import gensim
+import gensim.downloader as api
 import numpy as np
 
 from .errors import WordNotFound400
 
 class Word2VecModel:
-    def __init__(self, file_path):
-        self.model = gensim.models.KeyedVectors.load_word2vec_format(file_path,
-            binary=True)
+    def __init__(self):
+        self.model = api.load('word2vec-google-news-300')
 
     def get_word_vec(self, word):
         try:
-            return self.model.wv[word]
+            return self.model[word]
         except:
             raise WordNotFound400
 
