@@ -14,6 +14,8 @@ def test_empty_list(parrot_model):
     assert parrot_model.get_word_vec_list(np.array([])) == []
 
 def test_random_lists(parrot_model):
+    np.random.seed(42)
+
     for i in range(100):
         dims = np.random.randint(low=1, high=1000)
         test_array = np.random.rand(dims)
