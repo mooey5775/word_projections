@@ -1,7 +1,9 @@
 import numpy as np
-from .errors import WordNotFound400
 
-class DebugModel():
+from word_projections.errors import WordNotFound400
+from .basemodel import BaseModel
+
+class DebugModel(BaseModel):
     def __init__(self, vector_size):
         self.dims = vector_size
         if self.dims == 0:

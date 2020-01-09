@@ -15,6 +15,3 @@ def test_nonexistent_words(word2vec_model, word):
     """
     with pytest.raises(WordNotFound400):
         word2vec_model.get_word_vec(word)
-
-    with pytest.raises(WordNotFound400):
-        word2vec_model.get_word_vec_list(word)

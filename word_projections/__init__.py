@@ -4,8 +4,8 @@ import numpy as np
 import argparse
 import logging
 
-from .debug import DebugModel
-from .word2vec import Word2VecModel
+from .models.debug import DebugModel
+from .models.word2vec import Word2VecModel
 from .errors import WordNotFound400, AxisNotFound400, InvalidList400
 from .axis_handler import AxisHandler
 

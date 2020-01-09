@@ -3,7 +3,7 @@ import numpy as np
 import pickle
 
 from word_projections.errors import WordNotFound400
-from word_projections.debug import DebugModel
+from word_projections.models.debug import DebugModel
 
 ENGLISH_WORDS = ['a', 'b', 'c', 'the', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog']
 SPECIAL_CHARACTERS = ['test!', '!@#%&$%^)^(&*())', '{}|"']
@@ -17,12 +17,8 @@ def test_empty_word(debug_model):
     with pytest.raises(WordNotFound400):
         debug_model.get_word_vec('')
 
-    with pytest.raises(WordNotFound400):
-        debug_model.get_word_vec_list('')
-
 def _test_word(model, labels, word):
     assert np.all(model.get_word_vec(word) == labels[word])
-    assert model.get_word_vec_list(word) == labels[word].tolist()
 
 @pytest.mark.parametrize('word', ENGLISH_WORDS)
 def test_english(debug_model, debug_model_data, word):

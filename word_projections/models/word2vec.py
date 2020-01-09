@@ -1,9 +1,10 @@
 import gensim.downloader as api
 import numpy as np
 
-from .errors import WordNotFound400
+from word_projections.errors import WordNotFound400
+from .basemodel import BaseModel
 
-class Word2VecModel:
+class Word2VecModel(BaseModel):
     def __init__(self):
         self.model = api.load('word2vec-google-news-300')
         self.dims = 300
@@ -13,6 +14,3 @@ class Word2VecModel:
             return self.model[word]
         except:
             raise WordNotFound400
-
-    def get_word_vec_list(self, word):
-        return self.get_word_vec(word).tolist()
