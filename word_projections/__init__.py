@@ -1,7 +1,5 @@
 from flask import Flask, jsonify, request
 import numpy as np
-
-import argparse
 import logging
 
 from .models.debug import DebugModel
@@ -108,28 +106,17 @@ def get_batch_2d_projections(xaxis, yaxis):
 
     return jsonify(projections)
 
-def setup_app():
-    # Check for debug mode
-
-    ap = argparse.ArgumentParser()
-    ap.add_argument('--debug', action='store_true',
-                    help="use random data instead of loading model")
-    ap.add_argument('--debug-dims', type=int, default=300,
-                    help="dimension of debug model data")
-    args = vars(ap.parse_args())
-
+def setup_app(debug_mode, debug_dims=300):
     # Selectively load model based on debug mode
-
     logging.info("Loading model...")
-    if args['debug']:
+    if debug_mode:
         logging.warning("DEBUG MODE ENABLED")
         logging.warning("DO NOT RUN IN PRODUCTION ENVIRONMENT")
-        mc.model = DebugModel(args['debug_dims'])
+        mc.model = DebugModel(debug_dims)
     else:
         mc.model = Word2VecModel()
 
     # Generate axes
-
     logging.info("Generating axes")
     mc.axes = AxisHandler(mc.model, AXIS_DEFS)
 

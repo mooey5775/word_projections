@@ -15,6 +15,3 @@ class DebugModel(BaseModel):
 
         np.random.seed([ord(i) for i in word])
         return np.random.rand(self.dims)
-
-    def get_word_vec_list(self, word):
-        return self.get_word_vec(word).tolist()
